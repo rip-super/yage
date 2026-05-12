@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAGE — Final Blueprint</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&amp;family=DM+Sans:wght@300;400;500&amp;display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f7f6f2;
+            --surface: #eeecea;
+            --surface2: #e4e2de;
+            --text: #181816;
+            --text2: #52524e;
+            --text3: #888880;
+            --border: rgba(0, 0, 0, 0.09);
+            --border2: rgba(0, 0, 0, 0.16);
+            --accent: #0d6b50;
+            --code-bg: #1e1e1c;
+            --code-fg: #d4d2ca;
+
+            --teal-f: #E1F5EE;
+            --teal-s: #0F6E56;
+            --teal-t: #064832;
+            --amber-f: #FAEEDA;
+            --amber-s: #BA7517;
+            --amber-t: #5a3204;
+            --gray-f: #F1EFE8;
+            --gray-s: #888780;
+            --gray-t: #3c3c39;
+            --purple-f: #EEEDFE;
+            --purple-s: #534AB7;
+            --purple-t: #2e2878;
+            --coral-f: #FAECE7;
+            --coral-s: #993C1D;
+            --coral-t: #3e1609;
+            --blue-f: #E6F1FB;
+            --blue-s: #185FA5;
+            --blue-t: #0a3d6e;
+            --strip-f: #eeece6;
+            --strip-s: rgba(0, 0, 0, 0.12);
+            --strip-t: #888880;
+            --cont-f: #f0efe9;
+            --cont-s: rgba(0, 0, 0, 0.12);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #161614;
+                --surface: #1e1e1c;
+                --surface2: #252522;
+                --text: #e8e6de;
+                --text2: #9c9a92;
+                --text3: #5e5d58;
+                --border: rgba(255, 255, 255, 0.08);
+                --border2: rgba(255, 255, 255, 0.16);
+                --accent: #5DCAA5;
+                --code-bg: #111110;
+                --code-fg: #c8c6be;
+
+                --teal-f: #062e22;
+                --teal-s: #5DCAA5;
+                --teal-t: #9FE1CB;
+                --amber-f: #3a2003;
+                --amber-s: #EF9F27;
+                --amber-t: #FAC775;
+                --gray-f: #28281f;
+                --gray-s: #B4B2A9;
+                --gray-t: #D3D1C7;
+                --purple-f: #1e1960;
+                --purple-s: #AFA9EC;
+                --purple-t: #CECBF6;
+                --coral-f: #300e04;
+                --coral-s: #F0997B;
+                --coral-t: #F5C4B3;
+                --blue-f: #061e3a;
+                --blue-s: #85B7EB;
+                --blue-t: #B5D4F4;
+                --strip-f: #1e1e1c;
+                --strip-s: rgba(255, 255, 255, 0.1);
+                --strip-t: #5e5d58;
+                --cont-f: #1a1a18;
+                --cont-s: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 15px;
+            line-height: 1.7;
+            padding: 48px 24px 80px;
+        }
+
+        .wrap {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 48px;
+            border-bottom: 1px solid var(--border2);
+            padding-bottom: 28px;
+        }
+
+        header h1 {
+            font-family: 'DM Mono', monospace;
+            font-size: 26px;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: var(--text2);
+            font-size: 14px;
+        }
+
+        section {
+            margin-bottom: 48px;
+        }
+
+        h2 {
+            font-family: 'DM Mono', monospace;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 .badge {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .badge-default {
+            background: var(--teal-f);
+            color: var(--teal-t);
+            border: 1px solid var(--teal-s);
+        }
+
+        .badge-extra {
+            background: var(--amber-f);
+            color: var(--amber-t);
+            border: 1px solid var(--amber-s);
+        }
+
+        h3 {
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text2);
+            margin: 28px 0 10px;
+        }
+
+        p {
+            color: var(--text2);
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+
+        ol {
+            padding-left: 20px;
+            color: var(--text2);
+        }
+
+        ol li {
+            margin-bottom: 8px;
+        }
+
+        ol li strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-fg);
+            border-radius: 8px;
+            padding: 20px 22px;
+            overflow-x: auto;
+            font-family: 'DM Mono', monospace;
+            font-size: 12.5px;
+            line-height: 1.65;
+            margin: 12px 0 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        code {
+            font-family: 'DM Mono', monospace;
+            font-size: 12.5px;
+        }
+
+        p code,
+        li code {
+            background: var(--surface2);
+            color: var(--text);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* File tree — white-space:pre preserves all the box-drawing indentation */
+        .tree {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 20px;
+            font-family: 'DM Mono', monospace;
+            font-size: 12.5px;
+            line-height: 1.85;
+            color: var(--text2);
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .tree .hl {
+            color: var(--text);
+        }
+
+        .tree .dim {
+            color: var(--text3);
+        }
+
+        .tbl-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text3);
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border2);
+        }
+
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text2);
+            vertical-align: top;
+        }
+
+        td:first-child {
+            font-family: 'DM Mono', monospace;
+            color: var(--text);
+            font-size: 12.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .diagram {
+            margin-bottom: 48px;
+        }
+
+        .diagram svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* SVG module color themes */
+        .m-default rect {
+            fill: var(--cont-f);
+            stroke: var(--cont-s);
+        }
+
+        .m-teal rect {
+            fill: var(--teal-f);
+            stroke: var(--teal-s);
+            stroke-width: 0.5;
+        }
+
+        .m-teal text {
+            fill: var(--teal-t);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .m-amber rect {
+            fill: var(--amber-f);
+            stroke: var(--amber-s);
+            stroke-width: 0.5;
+        }
+
+        .m-amber text {
+            fill: var(--amber-t);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .m-gray rect {
+            fill: var(--gray-f);
+            stroke: var(--gray-s);
+            stroke-width: 0.5;
+        }
+
+        .m-gray text {
+            fill: var(--gray-t);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .m-coral rect {
+            fill: var(--coral-f);
+            stroke: var(--coral-s);
+            stroke-width: 0.5;
+        }
+
+        .m-coral text {
+            fill: var(--coral-t);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .m-blue rect {
+            fill: var(--blue-f);
+            stroke: var(--blue-s);
+            stroke-width: 0.5;
+        }
+
+        .m-blue text {
+            fill: var(--blue-t);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .m-strip rect {
+            fill: var(--strip-f);
+            stroke: var(--strip-s);
+            stroke-width: 0.5;
+        }
+
+        .m-strip text {
+            fill: var(--strip-t);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .svg-th {
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+
+        .svg-ts {
+            font-size: 11.5px;
+            font-weight: 400;
+        }
+
+        .svg-label {
+            font-size: 11px;
+            font-weight: 400;
+            fill: var(--text3);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .svg-sep {
+            stroke: var(--border2);
+        }
+    </style>
+    <!-- Code injected by Five-server -->
+    <script async="" data-id="five-server" data-file="/Users/sahil/Documents/code/projects/yage/blueprint.html" type="application/javascript"
+        src="/fiveserver.js"></script>
+    <style>
+        /* Injected by five-server */
+        /*[data-highlight="true"] {
+        border: 1px rgb(90,170,255) solid !important;
+        background-color: rgba(155,215,255,0.5);
+        animation: fadeOutHighlight 1s forwards 0.5s;
+      }
+      img[data-highlight="true"] {
+        filter: sepia(100%) hue-rotate(180deg) saturate(200%);
+        animation: fadeOutHighlightIMG 0.5s forwards 0.5s;
+      }*/
+        @keyframes fadeOutHighlight {
+            from {
+                background-color: rgba(155, 215, 255, 0.5);
+            }
+
+            to {
+                background-color: rgba(155, 215, 255, 0);
+            }
+        }
+
+        @keyframes fadeOutHighlightIMG {
+            0% {
+                filter: sepia(100%) hue-rotate(180deg) saturate(200%);
+            }
+
+            33% {
+                filter: sepia(66%) hue-rotate(180deg) saturate(100%);
+            }
+
+            50% {
+                filter: sepia(50%) hue-rotate(90deg) saturate(50%);
+            }
+
+            66% {
+                filter: sepia(33%) hue-rotate(0deg) saturate(100%);
+            }
+
+            100% {
+                filter: sepia(0%) hue-rotate(0deg) saturate(100%);
+            }
+        }
+
+        @keyframes fiveserverInfoPopup {
+            0% {
+                top: -40px;
+            }
+
+            15% {
+                top: 4px;
+            }
+
+            85% {
+                top: 4px;
+            }
+
+            100% {
+                top: -40px;
+            }
+        }
+
+        /*smaller*/
+        @media (max-width: 640px) {
+            #fiveserver-info-wrapper {
+                max-width: 98%;
+            }
+
+            #fiveserver-info {
+                border-radius: 0px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <header>
+            <h1>YAGE: Yet Another Game Engine — Final Blueprint</h1>
+            <p>Architecture reference. Every module, every API, every design decision.</p>
+        </header>
+
+        <!-- ─── DIAGRAM ───────────────────────────────────────────────────────── -->
+        <div class="diagram">
+            <svg viewBox="0 0 720 460" xmlns="http://www.w3.org/2000/svg">
+
+                <!-- Default bundle container -->
+                <g class="m-default">
+                    <rect x="20" y="0" width="680" height="120" rx="12" stroke-dasharray="5 4" stroke-width="0.8"></rect>
+                </g>
+                <text class="svg-label" x="38" y="15" dominant-baseline="central">#include "yage.h" — always available</text>
+
+                <!-- Window -->
+                <g class="m-teal">
+                    <rect x="40" y="30" width="196" height="72" rx="8"></rect>
+                    <text class="svg-th" x="138" y="55" text-anchor="middle" dominant-baseline="central">Window</text>
+                    <text class="svg-ts" x="138" y="78" text-anchor="middle" dominant-baseline="central">GLFW context · dt</text>
+                </g>
+
+                <!-- Renderer2D -->
+                <g class="m-teal">
+                    <rect x="256" y="30" width="208" height="72" rx="8"></rect>
+                    <text class="svg-th" x="360" y="55" text-anchor="middle" dominant-baseline="central">Renderer2D</text>
+                    <text class="svg-ts" x="360" y="78" text-anchor="middle" dominant-baseline="central">BeginFrame · Draw* · EndFrame</text>
+                </g>
+
+                <!-- Input -->
+                <g class="m-teal">
+                    <rect x="484" y="30" width="196" height="72" rx="8"></rect>
+                    <text class="svg-th" x="582" y="55" text-anchor="middle" dominant-baseline="central">Input</text>
+                    <text class="svg-ts" x="582" y="78" text-anchor="middle" dominant-baseline="central">Key · MouseButton enums</text>
+                </g>
+
+                <!-- types.h strip -->
+                <g class="m-strip">
+                    <rect x="20" y="126" width="680" height="30" rx="6"></rect>
+                    <text class="svg-ts" x="360" y="141" text-anchor="middle" dominant-baseline="central">types.h — Texture · Color · Rect · Transform
+                        · WindowConfig · GLVersion — no module owns this</text>
+                </g>
+
+                <!-- Extras separator -->
+                <line x1="40" y1="170" x2="680" y2="170" class="svg-sep" stroke-width="0.5"></line>
+                <text class="svg-label" x="360" y="182" text-anchor="middle" dominant-baseline="central">extras — include individually — * = dashed
+                    border</text>
+
+                <!-- Camera2D -->
+                <g class="m-amber">
+                    <rect x="20" y="196" width="162" height="62" rx="8" stroke-dasharray="5 3"></rect>
+                    <text class="svg-th" x="101" y="218" text-anchor="middle" dominant-baseline="central">Camera2D *</text>
+                    <text class="svg-ts" x="101" y="240" text-anchor="middle" dominant-baseline="central">View transform</text>
+                </g>
+
+                <!-- Assets -->
+                <g class="m-amber">
+                    <rect x="194" y="196" width="162" height="62" rx="8" stroke-dasharray="5 3"></rect>
+                    <text class="svg-th" x="275" y="218" text-anchor="middle" dominant-baseline="central">Assets *</text>
+                    <text class="svg-ts" x="275" y="240" text-anchor="middle" dominant-baseline="central">Load + cache</text>
+                </g>
+
+                <!-- AudioEngine -->
+                <g class="m-amber">
+                    <rect x="368" y="196" width="162" height="62" rx="8" stroke-dasharray="5 3"></rect>
+                    <text class="svg-th" x="449" y="218" text-anchor="middle" dominant-baseline="central">AudioEngine *</text>
+                    <text class="svg-ts" x="449" y="240" text-anchor="middle" dominant-baseline="central">Sound · Music</text>
+                </g>
+
+                <!-- Scene -->
+                <g class="m-amber">
+                    <rect x="542" y="196" width="158" height="62" rx="8" stroke-dasharray="5 3"></rect>
+                    <text class="svg-th" x="621" y="218" text-anchor="middle" dominant-baseline="central">Scene *</text>
+                    <text class="svg-ts" x="621" y="240" text-anchor="middle" dominant-baseline="central">Scene + SceneManager</text>
+                </g>
+
+                <!-- User modules separator -->
+                <line x1="40" y1="274" x2="680" y2="274" class="svg-sep" stroke-width="0.5"></line>
+                <text class="svg-label" x="360" y="286" text-anchor="middle" dominant-baseline="central">your modules — peer level, same rules</text>
+
+                <!-- User modules -->
+                <g class="m-coral">
+                    <rect x="20" y="300" width="680" height="50" rx="8" stroke-dasharray="5 3"></rect>
+                    <text class="svg-th" x="360" y="318" text-anchor="middle" dominant-baseline="central">Your modules *</text>
+                    <text class="svg-ts" x="360" y="338" text-anchor="middle" dominant-baseline="central">physics · networking · AI · etc. — plain
+                        data in, plain data out, zero engine knowledge</text>
+                </g>
+
+                <!-- Foundation separator -->
+                <line x1="40" y1="364" x2="680" y2="364" class="svg-sep" stroke-width="0.5"></line>
+                <text class="svg-label" x="360" y="376" text-anchor="middle" dominant-baseline="central">foundation — vendor libs, never touched
+                    directly by user code</text>
+
+                <!-- GLFW -->
+                <g class="m-blue">
+                    <rect x="20" y="390" width="218" height="50" rx="8"></rect>
+                    <text class="svg-th" x="129" y="408" text-anchor="middle" dominant-baseline="central">GLFW</text>
+                    <text class="svg-ts" x="129" y="428" text-anchor="middle" dominant-baseline="central">Window · events · context</text>
+                </g>
+
+                <!-- OpenGL + GLAD -->
+                <g class="m-blue">
+                    <rect x="250" y="390" width="220" height="50" rx="8"></rect>
+                    <text class="svg-th" x="360" y="408" text-anchor="middle" dominant-baseline="central">OpenGL + GLAD</text>
+                    <text class="svg-ts" x="360" y="428" text-anchor="middle" dominant-baseline="central">3.3 core · function loading</text>
+                </g>
+
+                <!-- stb / glm / miniaudio -->
+                <g class="m-blue">
+                    <rect x="482" y="390" width="218" height="50" rx="8"></rect>
+                    <text class="svg-th" x="591" y="408" text-anchor="middle" dominant-baseline="central">stb · glm · miniaudio</text>
+                    <text class="svg-ts" x="591" y="428" text-anchor="middle" dominant-baseline="central">images · math · audio</text>
+                </g>
+
+            </svg>
+        </div>
+
+        <!-- ─── DESIGN PHILOSOPHY ──────────────────────────────────────────────── -->
+        <section>
+            <h2>Design Philosophy</h2>
+            <ol>
+                <li><strong>No central Engine class.</strong> The user's <code>main()</code> or <code>SceneManager</code> is the engine.</li>
+                <li><strong>Raw loop or Scene module — both first-class.</strong> <code>Scene</code> is an optional convenience wrapper, not a
+                    requirement.</li>
+                <li><strong>Flat parameters everywhere.</strong> No per-shape structs. <code>DrawRect(x, y, w, h, color)</code>, not
+                    <code>DrawRect(RectShape)</code>.
+                </li>
+                <li><strong>Modules communicate via plain data only.</strong> <code>glm::mat4</code>, <code>float</code>, <code>Color</code>,
+                    <code>Rect</code> — never via each other's class types.
+                </li>
+                <li><strong>Nothing knows about anything it doesn't need to.</strong> Renderer renders. Window windows. Camera does math. No
+                    cross-contamination.</li>
+                <li><strong>One level of inheritance maximum.</strong> Only <code>Scene</code> uses it, and only so <code>SceneManager</code> has a
+                    common base to dispatch on.</li>
+                <li><strong>Extras means truly optional.</strong> Any dashed-border module can be omitted entirely with no effect on anything else.
+                </li>
+                <li><strong>OpenGL 3.3 Core Profile by default.</strong> Configurable via <code>WindowConfig</code>. No renderer factory — just
+                    OpenGL, always.</li>
+                <li><strong>No raw GLFW in user code.</strong> <code>Input</code> exposes its own <code>Key</code> and <code>MouseButton</code> enums.
+                    Time is read via <code>window.GetDeltaTime()</code>.</li>
+            </ol>
+        </section>
+
+        <!-- ─── FILE STRUCTURE ────────────────────────────────────────────────── -->
+        <section>
+            <h2>File Structure</h2>
+            <pre class="tree"><span class="hl">yage/</span>
+├── <span class="hl">yage.h</span> <span class="dim">← umbrella: includes window, renderer2d, input, types</span>
+├── <span class="hl">types.h</span> <span class="dim">← shared plain-data types, no module owns this</span>
+├── <span class="hl">window.h</span> / window.cpp
+├── <span class="hl">renderer2d.h</span> / renderer2d.cpp
+├── <span class="hl">input.h</span> / input.cpp
+│
+├── <span class="hl">extras/</span>
+│ ├── <span class="hl">camera2d.h</span> / camera2d.cpp
+│ ├── <span class="hl">assets.h</span> / assets.cpp
+│ ├── <span class="hl">audio.h</span> / audio.cpp
+│ └── <span class="hl">scene/</span>
+│ ├── <span class="hl">scene.h</span>
+│ └── <span class="hl">scene_manager.h</span> / scene_manager.cpp
+│
+└── <span class="hl">deps/</span>
+  ├── glad/ <span class="dim">← OpenGL function loader</span>
+  ├── glm/ <span class="dim">← math library</span>
+  ├── stb_image.h <span class="dim">← image loading (Assets only)</span>
+  └── miniaudio.h <span class="dim">← audio backend (AudioEngine only)</span></pre>
+        </section>
+
+        <!-- ─── TYPES.H ──────────────────────────────────────────────────────── -->
+        <section>
+            <h2>types.h <span class="badge badge-default">always available</span></h2>
+            <p>No module owns this file. Contains only types that multiple unrelated modules reference. <code>Sound</code> and <code>Music</code> are
+                <em>not</em> here — they live in <code>audio.h</code>.
+            </p>
+            <pre>#pragma once
+#include &lt;string&gt;
+#include &lt;glm/glm.hpp&gt;
+
+enum class GLVersion { GL_3_3, GL_4_1, GL_4_4, GL_4_6 };
+
+struct WindowConfig {
+    std::string title      = "My Game";
+    int         width      = 1280;
+    int         height     = 720;
+    bool        vsync      = true;
+    bool        fullscreen = false;
+    bool        resizable  = true;
+    GLVersion   gl_version = GLVersion::GL_3_3;
+};
+
+struct Color {
+    float r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;
+};
+
+struct Rect {
+    float x = 0.0f, y = 0.0f;
+    float w = 1.0f, h = 1.0f;
+};
+
+struct Transform {
+    glm::vec3 position = { 0.0f, 0.0f, 0.0f }; // z always 0 for 2D
+    float     rotation = 0.0f;                  // radians, around Z axis
+    glm::vec2 scale    = { 1.0f, 1.0f };
+};
+
+struct Texture {
+    unsigned int gl_id = 0;
+    int          w     = 0;
+    int          h     = 0;
+};</pre>
+        </section>
+
+        <!-- ─── WINDOW ───────────────────────────────────────────────────────── -->
+        <section>
+            <h2>window.h <span class="badge badge-default">always available</span></h2>
+            <p>Thin GLFW wrapper. Creates the window and the OpenGL context. Tracks frame timing internally so user code never has to touch
+                <code>glfwGetTime()</code>. Knows nothing about rendering or input.
+            </p>
+            <pre>#pragma once
+#include "types.h"
+
+class Window {
+public:
+    explicit Window(const WindowConfig&amp; cfg);
+    ~Window();
+
+    bool        ShouldClose()  const;
+    void        SwapBuffers();
+    void        SetTitle(const std::string&amp; title);
+    glm::ivec2  GetSize()      const;
+    float       GetAspect()    const;
+
+    // Frame timing — call GetDeltaTime() once per frame before any update logic.
+    float       GetDeltaTime() const; // seconds elapsed since the previous frame
+    float       GetTime()      const; // total seconds since window creation
+
+    GLFWwindow* GetHandle()    const; // exposed for Input callback registration
+};</pre>
+        </section>
+
+        <!-- ─── RENDERER2D ──────────────────────────────────────────────────── -->
+        <section>
+            <h2>renderer2d.h <span class="badge badge-default">always available</span></h2>
+            <p>Batch renderer. Accepts a <code>glm::mat4</code> view-projection matrix — has no idea where it came from. Never creates textures. All
+                draw calls use flat parameters, no per-shape structs. <code>EndFrame()</code> flushes the entire batch as one draw call.</p>
+            <pre>#pragma once
+#include "types.h"
+#include "window.h"
+#include &lt;glm/glm.hpp&gt;
+
+class Renderer2D {
+public:
+    explicit Renderer2D(const Window&amp; window);
+    ~Renderer2D();
+
+    // Call once at the start of each frame.
+    // Pass Camera2D::GetViewProjection() here, or omit for a fixed view.
+    void BeginFrame(const glm::mat4&amp; view_proj = glm::mat4(1.0f));
+
+    // Flushes the batch to the GPU. Call once at the end of each frame.
+    void EndFrame();
+
+    // --- Rectangles ---
+
+    void DrawRect(float x, float y, float w, float h, Color color);
+
+    // Per-vertex color (TL, TR, BL, BR) — use for gradients
+    void DrawRect(float x, float y, float w, float h,
+                  Color tl, Color tr, Color bl, Color br);
+
+    void DrawRectOutline(float x, float y, float w, float h,
+                         float thickness, Color color);
+
+    // --- Sprites (textured quads, rotation supported) ---
+
+    void DrawSprite(const Texture&amp; tex,
+                    float x, float y, float w, float h,
+                    float rotation = 0.0f,
+                    Color tint     = { 1, 1, 1, 1 });
+
+    // Spritesheet region — uv_region is normalised (0..1)
+    void DrawSprite(const Texture&amp; tex,
+                    float x, float y, float w, float h,
+                    Rect  uv_region,
+                    float rotation = 0.0f,
+                    Color tint     = { 1, 1, 1, 1 });
+
+    // --- Circles ---
+
+    void DrawCircle(float x, float y, float radius, Color color);
+
+    void DrawCircleOutline(float x, float y, float radius,
+                           float thickness, Color color);
+
+    // --- Lines ---
+
+    void DrawLine(float x0, float y0, float x1, float y1,
+                  float thickness, Color color);
+
+    // Gradient — colour interpolates from start point to end point
+    void DrawLine(float x0, float y0, float x1, float y1,
+                  float thickness, Color from, Color to);
+
+    // --- Triangles ---
+
+    void DrawTriangle(float x0, float y0,
+                      float x1, float y1,
+                      float x2, float y2, Color color);
+
+    // Per-vertex color
+    void DrawTriangle(float x0, float y0,
+                      float x1, float y1,
+                      float x2, float y2,
+                      Color c0, Color c1, Color c2);
+
+    void SetShader(const Shader&amp; shader); // swap in a custom shader
+    void ResetShader();                    // back to the default sprite shader
+};</pre>
+        </section>
+
+        <!-- ─── INPUT ───────────────────────────────────────────────────────── -->
+        <section>
+            <h2>input.h <span class="badge badge-default">always available</span></h2>
+            <p>Snapshot-based input. Registers GLFW callbacks internally. Exposes its own <code>Key</code> and <code>MouseButton</code> enums so user
+                code has no reason to include or reference GLFW directly. Internally keeps two state arrays (current frame / last frame) so
+                <code>IsKeyPressed</code> and <code>IsKeyReleased</code> work without event queues.
+            </p>
+            <pre>#pragma once
+#include "window.h"
+#include &lt;glm/glm.hpp&gt;
+
+enum class Key {
+    // Letters
+    A, B, C, D, E, F, G, H, I, J, K, L, M,
+    N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+    // Numbers (top row)
+    Num0, Num1, Num2, Num3, Num4,
+    Num5, Num6, Num7, Num8, Num9,
+    // Arrow keys
+    Up, Down, Left, Right,
+    // Common keys
+    Space, Enter, Escape, Tab, Backspace,
+    LShift, RShift, LCtrl, RCtrl, LAlt, RAlt,
+    // Function keys
+    F1, F2, F3, F4, F5, F6,
+    F7, F8, F9, F10, F11, F12,
+};
+
+enum class MouseButton { Left, Right, Middle };
+
+class Input {
+public:
+    explicit Input(const Window&amp; window); // registers GLFW callbacks internally
+    void Poll();                           // call once per frame, before update logic
+
+    // Keyboard
+    bool IsKeyHeld    (Key key) const; // true every frame the key is held down
+    bool IsKeyPressed (Key key) const; // true only on the frame the key goes down
+    bool IsKeyReleased(Key key) const; // true only on the frame the key comes up
+
+    // Mouse
+    bool      IsMouseHeld    (MouseButton btn) const;
+    bool      IsMousePressed (MouseButton btn) const;
+    glm::vec2 GetMousePos    ()                const;
+    glm::vec2 GetMouseDelta  ()                const; // movement since last frame
+    float     GetScrollDelta ()                const;
+};</pre>
+        </section>
+
+        <!-- ─── CAMERA2D ────────────────────────────────────────────────────── -->
+        <section>
+            <h2>extras/camera2d.h <span class="badge badge-extra">extra</span></h2>
+            <p>Pure math. Outputs one <code>glm::mat4</code>. Knows nothing about the renderer. The renderer knows nothing about the camera. They
+                connect only by the user passing the matrix into <code>BeginFrame()</code>.</p>
+            <pre>#pragma once
+#include "types.h"
+#include "window.h"
+#include &lt;glm/glm.hpp&gt;
+
+class Camera2D {
+public:
+    void SetPosition(glm::vec2 pos);
+    void SetZoom    (float zoom);
+
+    // Smoothly moves the camera toward target each frame
+    void Follow(glm::vec2 target, float lerp_speed, float dt);
+
+    // Pass the return value directly into Renderer2D::BeginFrame()
+    glm::mat4 GetViewProjection(const Window&amp; window) const;
+
+    // Useful for mouse-picking and UI placement
+    glm::vec2 ScreenToWorld(glm::vec2 screen_pos, const Window&amp; window) const;
+    glm::vec2 WorldToScreen(glm::vec2 world_pos,  const Window&amp; window) const;
+};</pre>
+        </section>
+
+        <!-- ─── ASSETS ──────────────────────────────────────────────────────── -->
+        <section>
+            <h2>extras/assets.h <span class="badge badge-extra">extra</span></h2>
+            <p>Loads and caches textures and shaders using <code>stb_image</code> and raw OpenGL/GLAD directly. Does <em>not</em> depend on
+                <code>Renderer2D</code>. Returns <code>Texture</code> handles (defined in <code>types.h</code>) that the renderer simply accepts —
+                neither module knows about the other.
+            </p>
+            <pre>#pragma once
+#include "types.h"
+#include &lt;string&gt;
+
+struct Shader {
+    unsigned int gl_id = 0;
+};
+
+class Assets {
+public:
+    Assets()  = default;
+    ~Assets();
+
+    // Loads from disk and uploads to the GPU.
+    // Returns a cached copy if the path has already been loaded.
+    Texture LoadTexture(const std::string&amp; path);
+
+    // Compiles and links a vertex + fragment shader pair.
+    // Returns a cached copy if the paths have already been loaded.
+    Shader  LoadShader(const std::string&amp; vert_path,
+                       const std::string&amp; frag_path);
+
+    void Unload   (const std::string&amp; path); // free one asset
+    void UnloadAll();                         // free everything
+};</pre>
+        </section>
+
+        <!-- ─── AUDIO ───────────────────────────────────────────────────────── -->
+        <section>
+            <h2>extras/audio.h <span class="badge badge-extra">extra</span></h2>
+            <p>Completely standalone. <code>Sound</code> and <code>Music</code> are defined here — they do not appear anywhere else in the engine. No
+                dependency on any other module. Backed by <code>miniaudio</code> (single-header, no external dependencies).</p>
+            <pre>#pragma once
+#include &lt;string&gt;
+
+struct Sound { unsigned int id = 0; }; // defined here, not in types.h
+struct Music { unsigned int id = 0; }; // defined here, not in types.h
+
+class AudioEngine {
+public:
+    AudioEngine();   // initialises the miniaudio backend
+    ~AudioEngine();  // shuts it down
+
+    Sound LoadSound (const std::string&amp; path);
+    void  PlaySound (Sound s, float volume = 1.0f, float pitch = 1.0f);
+    void  StopSounds();
+
+    Music LoadMusic (const std::string&amp; path);
+    void  PlayMusic (Music m, bool loop = true, float volume = 1.0f);
+    void  StopMusic ();
+
+    void  SetMasterVolume(float v); // 0.0 – 1.0
+};</pre>
+        </section>
+
+        <!-- ─── SCENE MODULE ─────────────────────────────────────────────────── -->
+        <section>
+            <h2>extras/scene/ <span class="badge badge-extra">extra</span></h2>
+            <p>The only module that intentionally includes others — its job is to coordinate so the user doesn't have to write the main loop
+                themselves. <code>Scene</code> is the only place in the engine that uses inheritance, exactly one level deep.</p>
+
+            <h3>scene.h</h3>
+            <pre>#pragma once
+#include "types.h"
+
+class SceneManager;
+class Renderer2D;
+class Input;
+class Assets;
+class Window;
+
+class Scene {
+public:
+    WindowConfig window_config; // set this before SceneManager::Run() is called
+
+    virtual void OnStart()          = 0;
+    virtual void OnUpdate(float dt) = 0;
+    virtual void OnEnd()            = 0;
+    virtual ~Scene()                = default;
+
+protected:
+    // Injected by SceneManager before OnStart() is called.
+    Window*       window   = nullptr;
+    Renderer2D*   renderer = nullptr;
+    Input*        input    = nullptr;
+    Assets*       assets   = nullptr;
+    SceneManager* scenes   = nullptr;
+
+    friend class SceneManager;
+};</pre>
+
+            <h3>scene_manager.h</h3>
+            <pre>#pragma once
+#include &lt;memory&gt;
+#include "scene.h"
+
+class SceneManager {
+public:
+    // Creates Window, Renderer2D, Input, and Assets from the scene's window_config,
+    // injects them, calls OnStart(), runs the loop, calls OnEnd(), then cleans up.
+    void Run(std::unique_ptr&lt;Scene&gt; initial);
+
+    // Queue a full scene replacement. OnEnd() fires on the outgoing scene,
+    // then OnStart() fires on the incoming one. Never happens mid-frame.
+    void Set(std::unique_ptr&lt;Scene&gt; next);
+
+    // Push an overlay scene (pause menus, cutscenes).
+    // The scene underneath is paused but not destroyed.
+    void Push(std::unique_ptr&lt;Scene&gt; overlay);
+    void Pop();   // return to scene underneath
+
+    void Quit();  // exit the loop cleanly
+};</pre>
+        </section>
+
+        <!-- ─── USAGE: RAW LOOP ─────────────────────────────────────────────── -->
+        <section>
+            <h2>Usage — Raw Loop</h2>
+            <p>No Scene module required. Full manual control over the loop.</p>
+            <pre>#include "yage.h"                  // Window, Renderer2D, Input, types
+#include "extras/camera2d.h"
+#include "extras/assets.h"
+#include "extras/audio.h"
+
+int main() {
+    WindowConfig cfg;
+    cfg.title  = "My Game";
+    cfg.width  = 1280;
+    cfg.height = 720;
+
+    Window      window(cfg);
+    Renderer2D  renderer(window);
+    Input       input(window);
+    Camera2D    camera;
+    Assets      assets;
+    AudioEngine audio;
+
+    Texture hero = assets.LoadTexture("assets/hero.png");
+    Music   bgm  = audio.LoadMusic("assets/theme.mp3");
+    audio.PlayMusic(bgm);
+
+    while (!window.ShouldClose()) {
+        float dt = window.GetDeltaTime(); // call once per frame
+
+        input.Poll();
+
+        if (input.IsKeyHeld(Key::Right)) player_x += 200.0f * dt;
+        if (input.IsKeyHeld(Key::Left))  player_x -= 200.0f * dt;
+
+        camera.Follow({ player_x, player_y }, 5.0f, dt);
+
+        renderer.BeginFrame(camera.GetViewProjection(window));
+            renderer.DrawSprite(hero, player_x, player_y, 64, 64);
+            renderer.DrawRect(0, 0, 1280, 32, { 0.15f, 0.15f, 0.15f, 1.0f });
+        renderer.EndFrame();
+
+        window.SwapBuffers();
+    }
+}</pre>
+        </section>
+
+        <!-- ─── USAGE: SCENE MODULE ─────────────────────────────────────────── -->
+        <section>
+            <h2>Usage — Scene Module</h2>
+            <p>Same underlying modules, loop handled by <code>SceneManager</code>.</p>
+            <pre>
+#include "yage.h"
+#include "extras/scene/scene.h"
+#include "extras/camera2d.h"
+#include "extras/audio.h"
+
+class GameScene : public Scene {
+public:
+    GameScene() {
+        window_config.title  = "My Game";
+        window_config.width  = 1280;
+        window_config.height = 720;
+    }
+
+    void OnStart() override {
+        hero = assets-&gt;LoadTexture("assets/hero.png");
+        audio.PlayMusic(audio.LoadMusic("assets/theme.mp3"));
+    }
+
+    void OnUpdate(float dt) override {
+        if (input-&gt;IsKeyHeld(Key::Right))    player_x += 200.0f * dt;
+        if (input-&gt;IsKeyHeld(Key::Left))     player_x -= 200.0f * dt;
+
+        if (input-&gt;IsKeyPressed(Key::Escape))
+            scenes-&gt;Push(std::make_unique&lt;PauseScene&gt;());
+
+        camera.Follow({ player_x, player_y }, 5.0f, dt);
+
+        renderer-&gt;BeginFrame(camera.GetViewProjection(*window));
+            renderer-&gt;DrawSprite(hero, player_x, player_y, 64, 64);
+        renderer-&gt;EndFrame();
+    }
+
+    void OnEnd() override {}
+
+private:
+    Texture     hero;
+    Camera2D    camera;
+    AudioEngine audio;
+    float       player_x = 0, player_y = 0;
+};
+
+int main() {
+    SceneManager manager;
+    manager.Run(std::make_unique&lt;GameScene&gt;());
+}</pre>
+        </section>
+
+        <!-- ─── USER MODULES ────────────────────────────────────────────────── -->
+        <section>
+            <h2>Rules for Your Own Modules</h2>
+            <p>Physics, networking, AI — anything you add follows the exact same rules as every other extra. No special registration. No engine hooks.
+            </p>
+            <ol>
+                <li><strong>Define your types inside your own header.</strong> Nothing from <code>types.h</code> or the engine goes inside your module
+                    unless it's a plain data struct.</li>
+                <li><strong>Accept plain data, return plain data.</strong> Your physics module takes positions and velocities; it returns updated
+                    positions and velocities. It does not take a <code>Renderer2D&amp;</code>.</li>
+                <li><strong>Wire it up yourself in <code>OnUpdate</code> or your main loop.</strong> The engine never sees your module. You call it,
+                    read the results, and pass them to whoever needs them.</li>
+            </ol>
+            <pre>// your_physics.h — zero engine knowledge
+class PhysicsWorld {
+public:
+    void  Step   (float dt);
+    Body* AddBody(glm::vec2 position, float mass);
+    void  Remove (Body* b);
+};
+
+// Wired together only in your scene — the engine never sees this
+void MyGame::OnUpdate(float dt) {
+    physics.Step(dt);
+
+    renderer-&gt;BeginFrame(camera.GetViewProjection(*window));
+    for (auto&amp; b : bodies)
+        renderer-&gt;DrawSprite(tex, b-&gt;pos.x, b-&gt;pos.y, 32, 32);
+    renderer-&gt;EndFrame();
+}</pre>
+        </section>
+
+        <!-- ─── SUMMARY TABLE ───────────────────────────────────────────────── -->
+        <section>
+            <h2>Summary</h2>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Include</th>
+                            <th>Depends on</th>
+                            <th>Owns these types</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>types.h</td>
+                            <td>via yage.h</td>
+                            <td>glm</td>
+                            <td>Texture · Color · Rect · Transform · WindowConfig · GLVersion</td>
+                        </tr>
+                        <tr>
+                            <td>Window</td>
+                            <td>yage.h</td>
+                            <td>types.h · GLFW</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Renderer2D</td>
+                            <td>yage.h</td>
+                            <td>types.h · Window · GL</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Input</td>
+                            <td>yage.h</td>
+                            <td>types.h · Window · GLFW (internal)</td>
+                            <td>Key · MouseButton</td>
+                        </tr>
+                        <tr>
+                            <td>Camera2D</td>
+                            <td>extras/camera2d.h</td>
+                            <td>types.h · Window</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Assets</td>
+                            <td>extras/assets.h</td>
+                            <td>types.h · GL · stb</td>
+                            <td>Shader</td>
+                        </tr>
+                        <tr>
+                            <td>AudioEngine</td>
+                            <td>extras/audio.h</td>
+                            <td>miniaudio</td>
+                            <td>Sound · Music</td>
+                        </tr>
+                        <tr>
+                            <td>Scene module</td>
+                            <td>extras/scene/…</td>
+                            <td>all default modules</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Your modules</td>
+                            <td>your own header</td>
+                            <td>nothing in engine</td>
+                            <td>your own types</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</body>
+
+</html>
