@@ -65,8 +65,17 @@ namespace yage
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
             throw std::runtime_error("Failed to initalize GLAD");
 
-        glfwGetFramebufferSize(handle, &width, &height);
-        glViewport(0, 0, width, height);
+        int fb_width, fb_height;
+        glfwGetFramebufferSize(handle, &fb_width, &fb_height);
+        glViewport(0, 0, fb_width, fb_height);
+        this->fb_width = fb_width;
+        this->fb_height = fb_height;
+
+        int logical_width, logical_height;
+        glfwGetWindowSize(handle, &logical_width, &logical_height);
+        width = logical_width;
+        height = logical_height;
+
         // todo: gldepthtest??
 
         time = (float)glfwGetTime();
@@ -98,6 +107,8 @@ namespace yage
     glm::ivec2 Window::GetSize() const { return glm::ivec2(width, height); }
     int Window::GetWidth() const { return width; }
     int Window::GetHeight() const { return height; }
+    int Window::GetFramebufferWidth() const { return fb_width; }
+    int Window::GetFramebufferHeight() const { return fb_height; }
     float Window::GetAspect() const { return (float)width / float(height); }
 
     void Window::Poll()

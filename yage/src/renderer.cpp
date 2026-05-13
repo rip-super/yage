@@ -4,6 +4,35 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 
+// todo: make param naming consistent
+
+static void ComputePolygonMiter(
+    const glm::vec2 *verts, int count,
+    float half_thickness,
+    glm::vec2 *outer,
+    glm::vec2 *inner)
+{
+    for (int i = 0; i < count; i++)
+    {
+        glm::vec2 prev = verts[(i + count - 1) % count];
+        glm::vec2 curr = verts[i];
+        glm::vec2 next = verts[(i + 1) % count];
+
+        glm::vec2 d1 = glm::normalize(curr - prev);
+        glm::vec2 d2 = glm::normalize(next - curr);
+
+        glm::vec2 n1 = {-d1.y, d1.x};
+        glm::vec2 n2 = {-d2.y, d2.x};
+
+        glm::vec2 miter = glm::normalize(n1 + n2);
+        float len = half_thickness / glm::dot(miter, n1);
+        len = std::min(len, half_thickness * 4.0f);
+
+        outer[i] = curr + miter * len;
+        inner[i] = curr - miter * len;
+    }
+}
+
 namespace yage
 {
     Renderer::Renderer(const Window &window)
@@ -122,8 +151,7 @@ namespace yage
         verts.push_back({cx, cy, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
     }
 
-    void Renderer::DrawLine(float x0, float y0, float x1, float y1,
-                            float thickness, Color from, Color to)
+    void Renderer::DrawLine(float x0, float y0, float x1, float y1, float thickness, Color from, Color to)
     {
         assert(in_frame && "Draw called outside BeginFrame/EndFrame");
 
@@ -149,5 +177,137 @@ namespace yage
         verts.push_back({bx, by, from.r, from.g, from.b, from.a, 0, 0, 0, 0});
         verts.push_back({ex, ey, to.r, to.g, to.b, to.a, 0, 0, 0, 0});
         verts.push_back({cx, cy, to.r, to.g, to.b, to.a, 0, 0, 0, 0});
+    }
+
+    void Renderer::DrawTriangle(float x0, float y0, float x1, float y1, float x2, float y2, Color color)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        verts.push_back({x0, y0, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x1, y1, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x2, y2, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+    }
+
+    void Renderer::DrawTriangle(float x0, float y0, float x1, float y1, float x2, float y2, Color c0, Color c1, Color c2)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        verts.push_back({x0, y0, c0.r, c0.g, c0.b, c0.a, 0, 0, 0, 0});
+        verts.push_back({x1, y1, c1.r, c1.g, c1.b, c1.a, 0, 0, 0, 0});
+        verts.push_back({x2, y2, c2.r, c2.g, c2.b, c2.a, 0, 0, 0, 0});
+    }
+
+    void Renderer::DrawTriangleOutline(float x0, float y0, float x1, float y1, float x2, float y2, float thickness, Color c)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        glm::vec2 v[3] = {{x0, y0}, {x1, y1}, {x2, y2}};
+        glm::vec2 outer[3], inner[3];
+        ComputePolygonMiter(v, 3, thickness * 0.5f, outer, inner);
+
+        for (int i = 0; i < 3; i++)
+        {
+            int j = (i + 1) % 3;
+
+            verts.push_back({outer[i].x, outer[i].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({inner[j].x, inner[j].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+        }
+    }
+
+    void Renderer::DrawTriangleOutline(float x0, float y0, float x1, float y1, float x2, float y2, float thickness, Color c0, Color c1, Color c2)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        glm::vec2 v[3] = {{x0, y0}, {x1, y1}, {x2, y2}};
+        glm::vec2 outer[3], inner[3];
+        ComputePolygonMiter(v, 3, thickness * 0.5f, outer, inner);
+
+        Color colors[3] = {c0, c1, c2};
+
+        for (int i = 0; i < 3; i++)
+        {
+            int j = (i + 1) % 3;
+            Color ci = colors[i], cj = colors[j];
+
+            verts.push_back({outer[i].x, outer[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({inner[j].x, inner[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+        }
+    }
+
+    void Renderer::DrawRect(float x, float y, float w, float h, Color color)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        verts.push_back({x, y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x, y + h, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+
+        verts.push_back({x + w, y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x, y + h, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y + h, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+    }
+
+    void Renderer::DrawRect(float x, float y, float w, float h, Color tl, Color tr, Color bl, Color br)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        verts.push_back({x, y, tl.r, tl.g, tl.b, tl.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y, tr.r, tr.g, tr.b, tr.a, 0, 0, 0, 0});
+        verts.push_back({x, y + h, bl.r, bl.g, bl.b, bl.a, 0, 0, 0, 0});
+
+        verts.push_back({x + w, y, tr.r, tr.g, tr.b, tr.a, 0, 0, 0, 0});
+        verts.push_back({x, y + h, bl.r, bl.g, bl.b, bl.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y + h, br.r, br.g, br.b, br.a, 0, 0, 0, 0});
+    }
+
+    void Renderer::DrawRectOutline(float x, float y, float w, float h, float thickness, Color c)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        glm::vec2 v[4] = {{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}};
+        glm::vec2 outer[4], inner[4];
+        ComputePolygonMiter(v, 4, thickness * 0.5f, outer, inner);
+
+        for (int i = 0; i < 4; i++)
+        {
+            int j = (i + 1) % 4;
+            verts.push_back({outer[i].x, outer[i].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({inner[j].x, inner[j].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, c.r, c.g, c.b, c.a, 0, 0, 0, 0});
+        }
+    }
+
+    void Renderer::DrawRectOutline(float x, float y, float w, float h, float thickness, Color tl, Color tr, Color bl, Color br)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        glm::vec2 v[4] = {{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}};
+        glm::vec2 outer[4], inner[4];
+        ComputePolygonMiter(v, 4, thickness * 0.5f, outer, inner);
+
+        Color colors[4] = {tl, tr, br, bl};
+
+        for (int i = 0; i < 4; i++)
+        {
+            int j = (i + 1) % 4;
+            Color ci = colors[i], cj = colors[j];
+            verts.push_back({outer[i].x, outer[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({inner[j].x, inner[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+        }
     }
 }

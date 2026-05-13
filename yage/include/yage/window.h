@@ -16,6 +16,8 @@ namespace yage
         glm::ivec2 GetSize() const;
         int GetWidth() const;
         int GetHeight() const;
+        int GetFramebufferWidth() const;
+        int GetFramebufferHeight() const;
         float GetAspect() const;
 
         void Poll();
@@ -27,7 +29,7 @@ namespace yage
 
     private:
         GLFWwindow *handle;
-        int width, height;
+        int width, height, fb_width, fb_height;
         float time, dt;
     };
 }

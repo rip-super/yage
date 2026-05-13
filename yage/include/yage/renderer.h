@@ -62,7 +62,7 @@ namespace yage
         void DrawCircleOutline(float x, float y, float radius,
                                float thickness, Color color);
 
-        // todo: custom shaders and textures
+        // todo: custom shaders and textures, draw_polygon
 
     private:
         GLuint vao = 0;

@@ -19,9 +19,7 @@ int main()
 
         renderer.Clear({0.1f, 0.1f, 0.15f, 1.0f});
 
-        renderer.DrawLine(100, 100, 700, 100, 8.0f, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f});
-        renderer.DrawLine(400, 50, 400, 550, 4.0f, {0.0f, 1.0f, 0.0f, 1.0f});
-        renderer.DrawLine(100, 500, 700, 200, 8.0f, {0.0f, 0.0f, 1.0f, 1.0f});
+        renderer.DrawRectOutline(150, 150, 500, 300, 4.0f, Color::RGB(255, 0, 0), Color::RGB(0, 255, 0), Color::RGB(0, 0, 255), Color::RGB(255, 0, 255));
 
         renderer.EndFrame();
         window.SwapBuffers();
