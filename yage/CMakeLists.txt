@@ -4,13 +4,10 @@ add_library(yage STATIC ${YAGE_SOURCES})
 
 target_include_directories(yage
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/deps/glm
 )
 
-target_link_libraries(yage
-    PUBLIC glfw
-           glad
-           glm
-)
+target_link_libraries(yage PUBLIC glfw glad glm)
 
 if(WIN32)
     target_link_libraries(yage PUBLIC opengl32)

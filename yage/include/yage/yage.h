@@ -1,6 +1,4 @@
 #pragma once
 
-namespace yage
-{
-    void hello();
-}
+#include "types.h"
+#include "window.h"
