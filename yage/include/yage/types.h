@@ -25,4 +25,18 @@ namespace yage
         bool mouse_grab = false;
         GLVersion gl_version = GLVersion::GL_3_3;
     };
+
+    struct Color
+    {
+        float r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;
+    };
+
+    struct Vertex
+    {
+        float x, y;
+        float r, g, b, a;
+        float u, v;
+        float shape;
+        float param;
+    };
 }

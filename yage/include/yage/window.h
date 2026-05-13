@@ -14,6 +14,8 @@ namespace yage
         void SwapBuffers();
         void SetTitle(const std::string &title);
         glm::ivec2 GetSize() const;
+        int GetWidth() const;
+        int GetHeight() const;
         float GetAspect() const;
 
         void Poll();

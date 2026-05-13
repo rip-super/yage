@@ -1,0 +1,9 @@
+#pragma once
+namespace yage::internal
+{
+    inline constexpr const char *BATCH_VERT_SRC = R"glsl(@BATCH_VERT_SRC@
+)glsl";
+
+    inline constexpr const char *BATCH_FRAG_SRC = R"glsl(@BATCH_FRAG_SRC@
+)glsl";
+}

@@ -2,9 +2,18 @@ file(GLOB_RECURSE YAGE_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
 add_library(yage STATIC ${YAGE_SOURCES})
 
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/shaders/shader.vert" BATCH_VERT_SRC)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/shaders/shader.frag" BATCH_FRAG_SRC)
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/yage/shader_source.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/yage/shader_source.h"
+)
+
 target_include_directories(yage
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/deps/glm
+    PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_SOURCE_DIR}/deps/glm
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include 
 )
 
 target_link_libraries(yage PUBLIC glfw glad glm)

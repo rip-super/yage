@@ -96,6 +96,8 @@ namespace yage
     void Window::SwapBuffers() { glfwSwapBuffers(handle); }
     void Window::SetTitle(const std::string &title) { glfwSetWindowTitle(handle, title.c_str()); }
     glm::ivec2 Window::GetSize() const { return glm::ivec2(width, height); }
+    int Window::GetWidth() const { return width; }
+    int Window::GetHeight() const { return height; }
     float Window::GetAspect() const { return (float)width / float(height); }
 
     void Window::Poll()
