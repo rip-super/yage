@@ -48,6 +48,7 @@ namespace yage
 
         applyGLVersionHints(cfg.gl_version);
         glfwWindowHint(GLFW_RESIZABLE, cfg.resizable ? GLFW_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_SAMPLES, cfg.msaa_samples);
 
         handle = cfg.fullscreen
                      ? glfwCreateWindow(cfg.width, cfg.height, cfg.title.c_str(), glfwGetPrimaryMonitor(), NULL)
@@ -64,6 +65,9 @@ namespace yage
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
             throw std::runtime_error("Failed to initalize GLAD");
+
+        if (cfg.msaa_samples > 0)
+            glEnable(GL_MULTISAMPLE);
 
         int fb_width, fb_height;
         glfwGetFramebufferSize(handle, &fb_width, &fb_height);

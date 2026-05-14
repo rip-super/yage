@@ -26,6 +26,7 @@ namespace yage
         bool fullscreen = false;
         bool resizable = true;
         bool mouse_grab = false;
+        int msaa_samples = 4;
         GLVersion gl_version = GLVersion::GL_3_3;
     };
 
