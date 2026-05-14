@@ -1,5 +1,5 @@
 #pragma once
 
-#include "types.h"
+#include "utils.h"
 #include "window.h"
 #include "renderer.h"

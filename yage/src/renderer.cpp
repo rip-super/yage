@@ -1,7 +1,8 @@
-#include <yage/types.h>
+#include <yage/utils.h>
 #include <yage/renderer.h>
 #include <yage/shader_source.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <earcut.hpp>
 #include <cmath>
 
 // todo: make param naming consistent
@@ -179,6 +180,18 @@ namespace yage
         verts.push_back({cx, cy, to.r, to.g, to.b, to.a, 0, 0, 0, 0});
     }
 
+    void Renderer::DrawRotatedLine(float x0, float y0, float x1, float y1, float thickness, float degrees, Color color)
+    {
+        auto pts = Rotate({{x0, y0}, {x1, y1}}, degrees, (x0 + x1) * 0.5f, (y0 + y1) * 0.5f);
+        DrawLine(pts[0].x, pts[0].y, pts[1].x, pts[1].y, thickness, color);
+    }
+
+    void Renderer::DrawRotatedLine(float x0, float y0, float x1, float y1, float thickness, float degrees, Color from, Color to)
+    {
+        auto pts = Rotate({{x0, y0}, {x1, y1}}, degrees, (x0 + x1) * 0.5f, (y0 + y1) * 0.5f);
+        DrawLine(pts[0].x, pts[0].y, pts[1].x, pts[1].y, thickness, from, to);
+    }
+
     void Renderer::DrawTriangle(float x0, float y0, float x1, float y1, float x2, float y2, Color color)
     {
         assert(in_frame && "Draw called outside BeginFrame/EndFrame");
@@ -240,6 +253,30 @@ namespace yage
             verts.push_back({inner[j].x, inner[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
             verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
         }
+    }
+
+    void Renderer::DrawRotatedTriangle(float x0, float y0, float x1, float y1, float x2, float y2, float degrees, Color color)
+    {
+        auto pts = Rotate({{x0, y0}, {x1, y1}, {x2, y2}}, degrees, (x0 + x1 + x2) / 3.0f, (y0 + y1 + y2) / 3.0f);
+        DrawTriangle(pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, color);
+    }
+
+    void Renderer::DrawRotatedTriangle(float x0, float y0, float x1, float y1, float x2, float y2, float degrees, Color c0, Color c1, Color c2)
+    {
+        auto pts = Rotate({{x0, y0}, {x1, y1}, {x2, y2}}, degrees, (x0 + x1 + x2) / 3.0f, (y0 + y1 + y2) / 3.0f);
+        DrawTriangle(pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, c0, c1, c2);
+    }
+
+    void Renderer::DrawRotatedTriangleOutline(float x0, float y0, float x1, float y1, float x2, float y2, float thickness, float degrees, Color color)
+    {
+        auto pts = Rotate({{x0, y0}, {x1, y1}, {x2, y2}}, degrees, (x0 + x1 + x2) / 3.0f, (y0 + y1 + y2) / 3.0f);
+        DrawTriangleOutline(pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, thickness, color);
+    }
+
+    void Renderer::DrawRotatedTriangleOutline(float x0, float y0, float x1, float y1, float x2, float y2, float thickness, float degrees, Color c0, Color c1, Color c2)
+    {
+        auto pts = Rotate({{x0, y0}, {x1, y1}, {x2, y2}}, degrees, (x0 + x1 + x2) / 3.0f, (y0 + y1 + y2) / 3.0f);
+        DrawTriangleOutline(pts[0].x, pts[0].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, thickness, c0, c1, c2);
     }
 
     void Renderer::DrawRect(float x, float y, float w, float h, Color color)
@@ -309,5 +346,180 @@ namespace yage
             verts.push_back({inner[j].x, inner[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
             verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
         }
+    }
+
+    void Renderer::DrawRotatedRect(float x, float y, float w, float h, float degrees, Color color)
+    {
+        auto pts = Rotate({{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}}, degrees, x + w * 0.5f, y + h * 0.5f);
+        DrawPolygon(pts, color);
+    }
+
+    void Renderer::DrawRotatedRect(float x, float y, float w, float h, float degrees, Color tl, Color tr, Color bl, Color br)
+    {
+        auto pts = Rotate({{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}}, degrees, x + w * 0.5f, y + h * 0.5f);
+        DrawPolygon(pts, {tl, tr, br, bl});
+    }
+
+    void Renderer::DrawRotatedRectOutline(float x, float y, float w, float h, float thickness, float degrees, Color color)
+    {
+        auto pts = Rotate({{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}}, degrees, x + w * 0.5f, y + h * 0.5f);
+        DrawPolygonOutline(pts, thickness, color);
+    }
+
+    void Renderer::DrawRotatedRectOutline(float x, float y, float w, float h, float thickness, float degrees, Color tl, Color tr, Color bl, Color br)
+    {
+        auto pts = Rotate({{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}}, degrees, x + w * 0.5f, y + h * 0.5f);
+        DrawPolygonOutline(pts, thickness, {tl, tr, br, bl});
+    }
+
+    void Renderer::DrawCircle(float x, float y, float radius, Color color)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        float r = color.r, g = color.g, b = color.b, a = color.a;
+
+        verts.push_back({x - radius, y - radius, r, g, b, a, -1, -1, 1, 0});
+        verts.push_back({x + radius, y - radius, r, g, b, a, 1, -1, 1, 0});
+        verts.push_back({x - radius, y + radius, r, g, b, a, -1, 1, 1, 0});
+
+        verts.push_back({x + radius, y - radius, r, g, b, a, 1, -1, 1, 0});
+        verts.push_back({x + radius, y + radius, r, g, b, a, 1, 1, 1, 0});
+        verts.push_back({x - radius, y + radius, r, g, b, a, -1, 1, 1, 0});
+    }
+
+    void Renderer::DrawCircleOutline(float x, float y, float radius, float thickness, Color color)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+
+        float r = color.r, g = color.g, b = color.b, a = color.a;
+        float inner = (radius - thickness) / radius;
+        inner = std::max(inner, 0.0f);
+
+        verts.push_back({x - radius, y - radius, r, g, b, a, -1, -1, 1, inner});
+        verts.push_back({x + radius, y - radius, r, g, b, a, 1, -1, 1, inner});
+        verts.push_back({x - radius, y + radius, r, g, b, a, -1, 1, 1, inner});
+
+        verts.push_back({x + radius, y - radius, r, g, b, a, 1, -1, 1, inner});
+        verts.push_back({x + radius, y + radius, r, g, b, a, 1, 1, 1, inner});
+        verts.push_back({x - radius, y + radius, r, g, b, a, -1, 1, 1, inner});
+    }
+
+    void Renderer::DrawPolygon(std::vector<glm::vec2> points, Color color)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+        assert(points.size() >= 3 && "Polygon needs at least 3 points");
+
+        std::vector<std::vector<std::array<float, 2>>> poly;
+        auto &ring = poly.emplace_back();
+        for (auto &p : points)
+            ring.push_back({p.x, p.y});
+
+        auto indices = mapbox::earcut<uint32_t>(poly);
+
+        for (size_t i = 0; i + 2 < indices.size(); i += 3)
+        {
+            auto &p0 = points[indices[i]];
+            auto &p1 = points[indices[i + 1]];
+            auto &p2 = points[indices[i + 2]];
+
+            verts.push_back({p0.x, p0.y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            verts.push_back({p1.x, p1.y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            verts.push_back({p2.x, p2.y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        }
+    }
+
+    void Renderer::DrawPolygon(std::vector<glm::vec2> points, std::vector<Color> colors)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+        assert(points.size() >= 3 && "Polygon needs at least 3 points");
+        assert(points.size() == colors.size() && "Point and color count must match");
+
+        std::vector<std::vector<std::array<float, 2>>> poly;
+        auto &ring = poly.emplace_back();
+        for (auto &p : points)
+            ring.push_back({p.x, p.y});
+
+        auto indices = mapbox::earcut<uint32_t>(poly);
+
+        for (size_t i = 0; i + 2 < indices.size(); i += 3)
+        {
+            auto &p0 = points[indices[i]];
+            auto &p1 = points[indices[i + 1]];
+            auto &p2 = points[indices[i + 2]];
+
+            Color c0 = colors[indices[i]];
+            Color c1 = colors[indices[i + 1]];
+            Color c2 = colors[indices[i + 2]];
+
+            verts.push_back({p0.x, p0.y, c0.r, c0.g, c0.b, c0.a, 0, 0, 0, 0});
+            verts.push_back({p1.x, p1.y, c1.r, c1.g, c1.b, c1.a, 0, 0, 0, 0});
+            verts.push_back({p2.x, p2.y, c2.r, c2.g, c2.b, c2.a, 0, 0, 0, 0});
+        }
+    }
+
+    void Renderer::DrawPolygonOutline(std::vector<glm::vec2> points, float thickness, Color color)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+        assert(points.size() >= 3 && "Polygon needs at least 3 points");
+
+        std::vector<glm::vec2> outer(points.size()), inner(points.size());
+        ComputePolygonMiter(points.data(), (int)points.size(), thickness * 0.5f, outer.data(), inner.data());
+
+        for (size_t i = 0; i < points.size(); i++)
+        {
+            size_t j = (i + 1) % points.size();
+            verts.push_back({outer[i].x, outer[i].y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            verts.push_back({inner[j].x, inner[j].y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        }
+    }
+
+    void Renderer::DrawPolygonOutline(std::vector<glm::vec2> points, float thickness, std::vector<Color> colors)
+    {
+        assert(in_frame && "Draw called outside BeginFrame/EndFrame");
+        assert(points.size() >= 3 && "Polygon needs at least 3 points");
+        assert(points.size() == colors.size() && "Point and color count must match");
+
+        std::vector<glm::vec2> outer(points.size()), inner(points.size());
+        ComputePolygonMiter(points.data(), (int)points.size(), thickness * 0.5f, outer.data(), inner.data());
+
+        for (size_t i = 0; i < points.size(); i++)
+        {
+            size_t j = (i + 1) % points.size();
+            Color ci = colors[i], cj = colors[j];
+            verts.push_back({outer[i].x, outer[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+            verts.push_back({inner[i].x, inner[i].y, ci.r, ci.g, ci.b, ci.a, 0, 0, 0, 0});
+            verts.push_back({inner[j].x, inner[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+            verts.push_back({outer[j].x, outer[j].y, cj.r, cj.g, cj.b, cj.a, 0, 0, 0, 0});
+        }
+    }
+
+    void Renderer::DrawRotatedPolygon(std::vector<glm::vec2> points, float degrees, Color color)
+    {
+        auto c = Centroid(points);
+        DrawPolygon(Rotate(points, degrees, c.x, c.y), color);
+    }
+
+    void Renderer::DrawRotatedPolygon(std::vector<glm::vec2> points, float degrees, std::vector<Color> colors)
+    {
+        auto c = Centroid(points);
+        DrawPolygon(Rotate(points, degrees, c.x, c.y), colors);
+    }
+
+    void Renderer::DrawRotatedPolygonOutline(std::vector<glm::vec2> points, float thickness, float degrees, Color color)
+    {
+        auto c = Centroid(points);
+        DrawPolygonOutline(Rotate(points, degrees, c.x, c.y), thickness, color);
+    }
+
+    void Renderer::DrawRotatedPolygonOutline(std::vector<glm::vec2> points, float thickness, float degrees, std::vector<Color> colors)
+    {
+        auto c = Centroid(points);
+        DrawPolygonOutline(Rotate(points, degrees, c.x, c.y), thickness, colors);
     }
 }

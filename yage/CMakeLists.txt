@@ -13,7 +13,8 @@ configure_file(
 target_include_directories(yage
     PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
             ${CMAKE_SOURCE_DIR}/deps/glm
-    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include 
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
+            ${CMAKE_SOURCE_DIR}/deps/earcut
 )
 
 target_link_libraries(yage PUBLIC glfw glad glm)

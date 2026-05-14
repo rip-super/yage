@@ -1,4 +1,4 @@
-#include <yage/types.h>
+#include <yage/utils.h>
 #include <yage/window.h>
 #include <GLFW/glfw3.h>
 
@@ -76,7 +76,8 @@ namespace yage
         width = logical_width;
         height = logical_height;
 
-        // todo: gldepthtest??
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         time = (float)glfwGetTime();
         dt = 0.0f;

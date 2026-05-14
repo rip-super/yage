@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <vector>
+#include <cmath>
 
 namespace yage
 {
@@ -14,6 +16,7 @@ namespace yage
         GL_4_6
     };
 
+    // todo: show fps??
     struct WindowConfig
     {
         std::string title = "YAGE Application";
@@ -61,4 +64,49 @@ namespace yage
         float shape;
         float param;
     };
+
+    inline std::vector<glm::vec2> MakeRegularPolygon(float cx, float cy, float radius, int sides)
+    {
+        assert(sides >= 3 && "Polygon needs at least 3 sides");
+
+        std::vector<glm::vec2> pts;
+        pts.reserve(sides);
+
+        for (int i = 0; i < sides; i++)
+        {
+            float angle = glm::radians(-90.0f + (360.0f / sides) * i);
+            pts.push_back({cx + radius * std::cos(angle), cy + radius * std::sin(angle)});
+        }
+
+        return pts;
+    }
+
+    inline glm::vec2 Centroid(const std::vector<glm::vec2> &points)
+    {
+        glm::vec2 c = {0, 0};
+        for (auto &p : points)
+            c += p;
+        return c / (float)points.size();
+    }
+
+    inline std::vector<glm::vec2> Rotate(std::vector<glm::vec2> points, float degrees, float cx, float cy)
+    {
+        float rad = glm::radians(degrees);
+        float cos = std::cos(rad);
+        float sin = std::sin(rad);
+        for (auto &p : points)
+        {
+            float x = p.x - cx;
+            float y = p.y - cy;
+            p.x = x * cos - y * sin + cx;
+            p.y = x * sin + y * cos + cy;
+        }
+        return points;
+    }
+
+    inline std::vector<glm::vec2> Rotate(std::vector<glm::vec2> points, float degrees)
+    {
+        auto c = Centroid(points);
+        return Rotate(points, degrees, c.x, c.y);
+    }
 }
