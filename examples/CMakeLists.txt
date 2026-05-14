@@ -1,2 +1,3 @@
 add_subdirectory(hello_window)
 add_subdirectory(simple_shapes)
+add_subdirectory(custom_shader)

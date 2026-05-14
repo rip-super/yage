@@ -1,6 +1,7 @@
 #include <yage/utils.h>
 #include <yage/renderer.h>
 #include <yage/shader_source.h>
+#include <yage/extras/shader.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <earcut.hpp>
 #include <cmath>
@@ -36,10 +37,13 @@ static void ComputePolygonMiter(
 
 namespace yage
 {
-    Renderer::Renderer(const Window &window)
-        : window(window),
-          shader(Shader::FromSource(internal::BATCH_VERT_SRC, internal::BATCH_FRAG_SRC))
+    Renderer::Renderer(const Window &window) : window(window)
     {
+        Shader s = Shader::FromSource(internal::BATCH_VERT_SRC, internal::BATCH_FRAG_SRC);
+        batch_shader = s.id;
+        current_shader = s.id;
+        s.id = 0;
+
         verts.reserve(MAX_VERTS);
 
         glGenVertexArrays(1, &vao);
@@ -75,6 +79,25 @@ namespace yage
     {
         glDeleteVertexArrays(1, &vao);
         glDeleteBuffers(1, &vbo);
+        glDeleteProgram(batch_shader);
+    }
+
+    void Renderer::Flush()
+    {
+        if (verts.empty())
+            return;
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, verts.size() * sizeof(Vertex), verts.data());
+
+        glUseProgram(current_shader);
+        glUniformMatrix4fv(glGetUniformLocation(current_shader, "u_view_proj"), 1, GL_FALSE, &view_proj[0][0]);
+
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)verts.size());
+        glBindVertexArray(0);
+
+        verts.clear();
     }
 
     void Renderer::BeginFrame(const glm::mat4 &view_proj)
@@ -101,21 +124,23 @@ namespace yage
         assert(in_frame && "EndFrame called without BeginFrame");
 
         in_frame = false;
+        Flush();
+    }
 
-        if (verts.empty())
-            return;
+    void Renderer::SetShader(const Shader &shader)
+    {
+        assert(in_frame && "SetShader called outside BeginFrame/EndFrame");
+        Flush();
+        current_shader = shader.id;
+        glUseProgram(current_shader);
+    }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0,
-                        verts.size() * sizeof(Vertex),
-                        verts.data());
-
-        shader.bind();
-        shader.setMat4("u_view_proj", view_proj);
-
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, (GLsizei)verts.size());
-        glBindVertexArray(0);
+    void Renderer::ResetShader()
+    {
+        assert(in_frame && "ResetShader called outside BeginFrame/EndFrame");
+        Flush();
+        current_shader = batch_shader;
+        glUseProgram(current_shader);
     }
 
     void Renderer::Clear(Color color)

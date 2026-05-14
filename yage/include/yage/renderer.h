@@ -1,13 +1,14 @@
 #pragma once
 #include "utils.h"
 #include "window.h"
-#include "shader.h"
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <vector>
 
 namespace yage
 {
+    class Shader;
+
     class Renderer
     {
     public:
@@ -58,12 +59,17 @@ namespace yage
         void DrawRotatedPolygonOutline(std::vector<glm::vec2> points, float thickness, float degrees, Color color);
         void DrawRotatedPolygonOutline(std::vector<glm::vec2> points, float thickness, float degrees, std::vector<Color> colors);
 
-        // todo: custom shaders and textures
+        // custom shaders must handle the circle SDF manually.
+        void SetShader(const Shader &shader);
+        void ResetShader();
+
+        // todo: textures
 
     private:
         GLuint vao = 0;
         GLuint vbo = 0;
-        Shader shader;
+        GLuint batch_shader = 0;
+        GLuint current_shader = 0;
 
         std::vector<Vertex> verts;
         static constexpr uint32_t MAX_VERTS = 65'536;
@@ -72,5 +78,7 @@ namespace yage
         bool in_frame = false;
 
         const Window &window;
+
+        void Flush();
     };
 }
