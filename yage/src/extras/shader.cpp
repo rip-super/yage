@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 
 #ifdef __APPLE__
 #include <mach-o/dyld.h>

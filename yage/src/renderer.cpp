@@ -2,11 +2,17 @@
 #include <yage/renderer.h>
 #include <yage/shader_source.h>
 #include <yage/extras/shader.h>
+#include <yage/extras/texture.h>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <earcut.hpp>
 #include <cmath>
+#include <array>
 
 // todo: make param naming consistent
+//       fix circle texture UV seam
+//       texture support for outline draws
+//       add UV overloads for DrawPolygon(points, uvs, color)
 
 static void ComputePolygonMiter(
     const glm::vec2 *verts, int count,
@@ -44,6 +50,17 @@ namespace yage
         current_shader = s.id;
         s.id = 0;
 
+        uint32_t white = 0xFFFFFFFF;
+        glGenTextures(1, &white_texture);
+        glBindTexture(GL_TEXTURE_2D, white_texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &white);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glUseProgram(batch_shader);
+        glUniform1i(glGetUniformLocation(batch_shader, "u_tex"), 0);
+
         verts.reserve(MAX_VERTS);
 
         glGenVertexArrays(1, &vao);
@@ -80,6 +97,7 @@ namespace yage
         glDeleteVertexArrays(1, &vao);
         glDeleteBuffers(1, &vbo);
         glDeleteProgram(batch_shader);
+        glDeleteTextures(1, &white_texture);
     }
 
     void Renderer::Flush()
@@ -141,6 +159,18 @@ namespace yage
         Flush();
         current_shader = batch_shader;
         glUseProgram(current_shader);
+    }
+
+    void Renderer::SetTexture(const Texture &texture)
+    {
+        Flush();
+        glBindTexture(GL_TEXTURE_2D, texture.GetID());
+    }
+
+    void Renderer::ResetTexture()
+    {
+        Flush();
+        glBindTexture(GL_TEXTURE_2D, white_texture);
     }
 
     void Renderer::Clear(Color color)
@@ -309,12 +339,12 @@ namespace yage
         assert(in_frame && "Draw called outside BeginFrame/EndFrame");
 
         verts.push_back({x, y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
-        verts.push_back({x + w, y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
-        verts.push_back({x, y + h, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y, color.r, color.g, color.b, color.a, 1, 0, 0, 0});
+        verts.push_back({x, y + h, color.r, color.g, color.b, color.a, 0, 1, 0, 0});
 
-        verts.push_back({x + w, y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
-        verts.push_back({x, y + h, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
-        verts.push_back({x + w, y + h, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y, color.r, color.g, color.b, color.a, 1, 0, 0, 0});
+        verts.push_back({x, y + h, color.r, color.g, color.b, color.a, 0, 1, 0, 0});
+        verts.push_back({x + w, y + h, color.r, color.g, color.b, color.a, 1, 1, 0, 0});
     }
 
     void Renderer::DrawRect(float x, float y, float w, float h, Color tl, Color tr, Color bl, Color br)
@@ -322,12 +352,12 @@ namespace yage
         assert(in_frame && "Draw called outside BeginFrame/EndFrame");
 
         verts.push_back({x, y, tl.r, tl.g, tl.b, tl.a, 0, 0, 0, 0});
-        verts.push_back({x + w, y, tr.r, tr.g, tr.b, tr.a, 0, 0, 0, 0});
-        verts.push_back({x, y + h, bl.r, bl.g, bl.b, bl.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y, tr.r, tr.g, tr.b, tr.a, 1, 0, 0, 0});
+        verts.push_back({x, y + h, bl.r, bl.g, bl.b, bl.a, 0, 1, 0, 0});
 
-        verts.push_back({x + w, y, tr.r, tr.g, tr.b, tr.a, 0, 0, 0, 0});
-        verts.push_back({x, y + h, bl.r, bl.g, bl.b, bl.a, 0, 0, 0, 0});
-        verts.push_back({x + w, y + h, br.r, br.g, br.b, br.a, 0, 0, 0, 0});
+        verts.push_back({x + w, y, tr.r, tr.g, tr.b, tr.a, 1, 0, 0, 0});
+        verts.push_back({x, y + h, bl.r, bl.g, bl.b, bl.a, 0, 1, 0, 0});
+        verts.push_back({x + w, y + h, br.r, br.g, br.b, br.a, 1, 1, 0, 0});
     }
 
     void Renderer::DrawRectOutline(float x, float y, float w, float h, float thickness, Color c)
@@ -376,13 +406,27 @@ namespace yage
     void Renderer::DrawRotatedRect(float x, float y, float w, float h, float degrees, Color color)
     {
         auto pts = Rotate({{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}}, degrees, x + w * 0.5f, y + h * 0.5f);
-        DrawPolygon(pts, color);
+
+        verts.push_back({pts[0].x, pts[0].y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+        verts.push_back({pts[1].x, pts[1].y, color.r, color.g, color.b, color.a, 1, 0, 0, 0});
+        verts.push_back({pts[3].x, pts[3].y, color.r, color.g, color.b, color.a, 0, 1, 0, 0});
+
+        verts.push_back({pts[1].x, pts[1].y, color.r, color.g, color.b, color.a, 1, 0, 0, 0});
+        verts.push_back({pts[2].x, pts[2].y, color.r, color.g, color.b, color.a, 1, 1, 0, 0});
+        verts.push_back({pts[3].x, pts[3].y, color.r, color.g, color.b, color.a, 0, 1, 0, 0});
     }
 
     void Renderer::DrawRotatedRect(float x, float y, float w, float h, float degrees, Color tl, Color tr, Color bl, Color br)
     {
         auto pts = Rotate({{x, y}, {x + w, y}, {x + w, y + h}, {x, y + h}}, degrees, x + w * 0.5f, y + h * 0.5f);
-        DrawPolygon(pts, {tl, tr, br, bl});
+
+        verts.push_back({pts[0].x, pts[0].y, tl.r, tl.g, tl.b, tl.a, 0, 0, 0, 0});
+        verts.push_back({pts[1].x, pts[1].y, tr.r, tr.g, tr.b, tr.a, 1, 0, 0, 0});
+        verts.push_back({pts[3].x, pts[3].y, bl.r, bl.g, bl.b, bl.a, 0, 1, 0, 0});
+
+        verts.push_back({pts[1].x, pts[1].y, tr.r, tr.g, tr.b, tr.a, 1, 0, 0, 0});
+        verts.push_back({pts[2].x, pts[2].y, br.r, br.g, br.b, br.a, 1, 1, 0, 0});
+        verts.push_back({pts[3].x, pts[3].y, bl.r, bl.g, bl.b, bl.a, 0, 1, 0, 0});
     }
 
     void Renderer::DrawRotatedRectOutline(float x, float y, float w, float h, float thickness, float degrees, Color color)
@@ -434,6 +478,17 @@ namespace yage
         assert(in_frame && "Draw called outside BeginFrame/EndFrame");
         assert(points.size() >= 3 && "Polygon needs at least 3 points");
 
+        float min_x = points[0].x, max_x = points[0].x;
+        float min_y = points[0].y, max_y = points[0].y;
+        for (auto &p : points)
+        {
+            min_x = std::min(min_x, p.x);
+            max_x = std::max(max_x, p.x);
+            min_y = std::min(min_y, p.y);
+            max_y = std::max(max_y, p.y);
+        }
+        float rw = max_x - min_x, rh = max_y - min_y;
+
         std::vector<std::vector<std::array<float, 2>>> poly;
         auto &ring = poly.emplace_back();
         for (auto &p : points)
@@ -447,9 +502,13 @@ namespace yage
             auto &p1 = points[indices[i + 1]];
             auto &p2 = points[indices[i + 2]];
 
-            verts.push_back({p0.x, p0.y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
-            verts.push_back({p1.x, p1.y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
-            verts.push_back({p2.x, p2.y, color.r, color.g, color.b, color.a, 0, 0, 0, 0});
+            float u0 = (p0.x - min_x) / rw, v0 = (p0.y - min_y) / rh;
+            float u1 = (p1.x - min_x) / rw, v1 = (p1.y - min_y) / rh;
+            float u2 = (p2.x - min_x) / rw, v2 = (p2.y - min_y) / rh;
+
+            verts.push_back({p0.x, p0.y, color.r, color.g, color.b, color.a, u0, v0, 0, 0});
+            verts.push_back({p1.x, p1.y, color.r, color.g, color.b, color.a, u1, v1, 0, 0});
+            verts.push_back({p2.x, p2.y, color.r, color.g, color.b, color.a, u2, v2, 0, 0});
         }
     }
 
@@ -458,6 +517,17 @@ namespace yage
         assert(in_frame && "Draw called outside BeginFrame/EndFrame");
         assert(points.size() >= 3 && "Polygon needs at least 3 points");
         assert(points.size() == colors.size() && "Point and color count must match");
+
+        float min_x = points[0].x, max_x = points[0].x;
+        float min_y = points[0].y, max_y = points[0].y;
+        for (auto &p : points)
+        {
+            min_x = std::min(min_x, p.x);
+            max_x = std::max(max_x, p.x);
+            min_y = std::min(min_y, p.y);
+            max_y = std::max(max_y, p.y);
+        }
+        float rw = max_x - min_x, rh = max_y - min_y;
 
         std::vector<std::vector<std::array<float, 2>>> poly;
         auto &ring = poly.emplace_back();
@@ -476,9 +546,13 @@ namespace yage
             Color c1 = colors[indices[i + 1]];
             Color c2 = colors[indices[i + 2]];
 
-            verts.push_back({p0.x, p0.y, c0.r, c0.g, c0.b, c0.a, 0, 0, 0, 0});
-            verts.push_back({p1.x, p1.y, c1.r, c1.g, c1.b, c1.a, 0, 0, 0, 0});
-            verts.push_back({p2.x, p2.y, c2.r, c2.g, c2.b, c2.a, 0, 0, 0, 0});
+            float u0 = (p0.x - min_x) / rw, v0 = (p0.y - min_y) / rh;
+            float u1 = (p1.x - min_x) / rw, v1 = (p1.y - min_y) / rh;
+            float u2 = (p2.x - min_x) / rw, v2 = (p2.y - min_y) / rh;
+
+            verts.push_back({p0.x, p0.y, c0.r, c0.g, c0.b, c0.a, u0, v0, 0, 0});
+            verts.push_back({p1.x, p1.y, c1.r, c1.g, c1.b, c1.a, u1, v1, 0, 0});
+            verts.push_back({p2.x, p2.y, c2.r, c2.g, c2.b, c2.a, u2, v2, 0, 0});
         }
     }
 

@@ -30,6 +30,13 @@ namespace yage
         GLVersion gl_version = GLVersion::GL_3_3;
     };
 
+    struct TextureConfig
+    {
+        GLenum filter = GL_LINEAR;      // GL_LINEAR or GL_NEAREST
+        GLenum wrap = GL_CLAMP_TO_EDGE; // GL_REPEAT, GL_CLAMP_TO_EDGE, GL_MIRRORED_REPEAT
+        bool flip_y = false;
+    };
+
     struct Color
     {
         float r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;

@@ -89,14 +89,14 @@ namespace yage
         glfwSetWindowUserPointer(handle, this);
 
         // clang-format off
-        glfwSetFramebufferSizeCallback(handle, 
-            [](GLFWwindow *w, int width, int height) {
-                auto *win = (Window*)glfwGetWindowUserPointer(w);
-                win->width = width;
-                win->height = height;
-                glViewport(0, 0, width, height); 
-            }
-        );
+        glfwSetFramebufferSizeCallback(handle, [](GLFWwindow *w, int fb_w, int fb_h) {
+            auto *win = (Window*)glfwGetWindowUserPointer(w);
+            win->fb_width = fb_w;
+            win->fb_height = fb_h;
+            
+            glfwGetWindowSize(w, &win->width, &win->height);
+            glViewport(0, 0, fb_w, fb_h);
+        });
         // clang-format on
     }
 

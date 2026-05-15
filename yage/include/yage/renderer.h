@@ -8,6 +8,7 @@
 namespace yage
 {
     class Shader;
+    class Texture;
 
     class Renderer
     {
@@ -17,6 +18,13 @@ namespace yage
 
         void BeginFrame(const glm::mat4 &view_proj = glm::mat4(1.0f));
         void EndFrame();
+
+        // custom shaders must handle the circle SDF manually.
+        void SetShader(const Shader &shader);
+        void ResetShader();
+
+        void SetTexture(const Texture &tex);
+        void ResetTexture();
 
         void Clear(Color color = {0.0f, 0.0f, 0.0f, 1.0f});
 
@@ -59,17 +67,12 @@ namespace yage
         void DrawRotatedPolygonOutline(std::vector<glm::vec2> points, float thickness, float degrees, Color color);
         void DrawRotatedPolygonOutline(std::vector<glm::vec2> points, float thickness, float degrees, std::vector<Color> colors);
 
-        // custom shaders must handle the circle SDF manually.
-        void SetShader(const Shader &shader);
-        void ResetShader();
-
-        // todo: textures
-
     private:
         GLuint vao = 0;
         GLuint vbo = 0;
         GLuint batch_shader = 0;
         GLuint current_shader = 0;
+        GLuint white_texture = 0;
 
         std::vector<Vertex> verts;
         static constexpr uint32_t MAX_VERTS = 65'536;
