@@ -125,6 +125,9 @@ namespace yage
         in_frame = true;
         verts.clear();
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, white_texture);
+
         if (view_proj == glm::mat4(1.0f))
         {
             float w = (float)window.GetWidth();
