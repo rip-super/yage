@@ -4,6 +4,8 @@
 
 namespace yage
 {
+    class Input;
+
     class Window
     {
     public:
@@ -21,6 +23,7 @@ namespace yage
         float GetAspect() const;
 
         void Poll();
+        void Poll(Input &input);
 
         float GetDt() const;
         float GetTime() const;

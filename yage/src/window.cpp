@@ -1,5 +1,6 @@
 #include <yage/utils.h>
 #include <yage/window.h>
+#include <yage/input.h>
 #include <GLFW/glfw3.h>
 
 static void applyGLVersionHints(yage::GLVersion version)
@@ -83,9 +84,6 @@ namespace yage
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        time = (float)glfwGetTime();
-        dt = 0.0f;
-
         glfwSetWindowUserPointer(handle, this);
 
         // clang-format off
@@ -98,6 +96,9 @@ namespace yage
             glViewport(0, 0, fb_w, fb_h);
         });
         // clang-format on
+
+        time = (float)glfwGetTime();
+        dt = 0.0f;
     }
 
     Window::~Window()
@@ -122,6 +123,12 @@ namespace yage
         dt = now - time;
         time = now;
         glfwPollEvents();
+    }
+
+    void Window::Poll(Input &input)
+    {
+        input.Snapshot();
+        Poll();
     }
 
     float Window::GetDt() const { return dt; }

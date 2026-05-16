@@ -1,7 +1,6 @@
 file(GLOB_RECURSE YAGE_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
-add_library(yage STATIC ${YAGE_SOURCES}
-    src/extras/texture.cpp)
+add_library(yage STATIC ${YAGE_SOURCES})
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/shaders/shader.vert" BATCH_VERT_SRC)
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/shaders/shader.frag" BATCH_FRAG_SRC)
