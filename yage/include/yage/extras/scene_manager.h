@@ -2,6 +2,9 @@
 #include <yage/extras/scene.h>
 #include <memory>
 #include <stack>
+#include <queue>
+#include <unordered_map>
+#include <string>
 
 namespace yage
 {
@@ -12,10 +15,11 @@ namespace yage
     class SceneManager
     {
     public:
-        void Run(std::unique_ptr<Scene> inital);
-        void Set(std::unique_ptr<Scene> next);
+        void RegisterScene(const std::string& name, Scene* scene);
+        void Run(const std::string& initial);
+        void Set(const std::string& next);
 
-        void Push(std::unique_ptr<Scene> overlay);
+        void Push(const std::string& overlay);
         void Pop();
 
         void Quit();
@@ -27,8 +31,11 @@ namespace yage
         Renderer *renderer = nullptr;
         Input *input = nullptr;
 
-        std::unique_ptr<Scene> next;
-        std::stack<std::unique_ptr<Scene>> overlays;
+        std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
+        std::string current_name;
+        std::string next_name;
+        std::stack<std::string> overlay_names;
+        std::queue<std::string> pending_overlays;
         bool quit = false;
     };
 }

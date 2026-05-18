@@ -14,9 +14,17 @@ namespace yage
         scene->scenes = this;
     }
 
-    void SceneManager::Run(std::unique_ptr<Scene> initial)
+    void SceneManager::RegisterScene(const std::string &name, Scene *scene)
     {
-        Window window(initial->window_config);
+        scenes[name] = std::unique_ptr<Scene>(scene);
+    }
+
+    void SceneManager::Run(const std::string &initial)
+    {
+        if (scenes.find(initial) == scenes.end())
+            return;
+
+        Window window(scenes[initial]->window_config);
         Renderer renderer(window);
         Input input(window);
 
@@ -24,62 +32,82 @@ namespace yage
         this->renderer = &renderer;
         this->input = &input;
 
-        Inject(initial.get());
-        initial->OnStart();
-
-        std::unique_ptr<Scene> current = std::move(initial);
+        current_name = initial;
+        Inject(scenes[current_name].get());
+        window.SetTitle(scenes[current_name]->window_config.title);
+        scenes[current_name]->OnStart();
 
         while (!window.ShouldClose() && !quit)
         {
             window.Poll(input);
             float dt = window.GetDt();
 
-            if (next)
+            if (!next_name.empty())
             {
-                current->OnEnd();
-                Inject(next.get());
-                next->OnStart();
-                current = std::move(next);
+                while (!overlay_names.empty())
+                {
+                    scenes[overlay_names.top()]->OnEnd();
+                    overlay_names.pop();
+                }
+                while (!pending_overlays.empty())
+                    pending_overlays.pop();
+
+                scenes[current_name]->OnEnd();
+                current_name = next_name;
+                next_name.clear();
+                Inject(scenes[current_name].get());
+                window.SetTitle(scenes[current_name]->window_config.title);
+                scenes[current_name]->OnStart();
+            }
+
+            while (!pending_overlays.empty())
+            {
+                std::string overlay = pending_overlays.front();
+                pending_overlays.pop();
+                Inject(scenes[overlay].get());
+                scenes[overlay]->OnStart();
+                overlay_names.push(overlay);
+                window.SetTitle(scenes[overlay]->window_config.title);
             }
 
             renderer.BeginFrame();
-
-            current->OnUpdate(dt);
-
-            if (!overlays.empty())
-                overlays.top()->OnUpdate(dt);
+            if (overlay_names.empty())
+                scenes[current_name]->OnUpdate(dt);
+            else
+                scenes[overlay_names.top()]->OnUpdate(dt);
 
             renderer.EndFrame();
             window.SwapBuffers();
         }
 
-        while (!overlays.empty())
+        while (!overlay_names.empty())
         {
-            overlays.top()->OnEnd();
-            overlays.pop();
+            scenes[overlay_names.top()]->OnEnd();
+            overlay_names.pop();
         }
 
-        current->OnEnd();
+        scenes[current_name]->OnEnd();
     }
 
-    void SceneManager::Set(std::unique_ptr<Scene> next)
+    void SceneManager::Set(const std::string &next)
     {
-        this->next = std::move(next);
+        next_name = next;
     }
 
-    void SceneManager::Push(std::unique_ptr<Scene> overlay)
+    void SceneManager::Push(const std::string &overlay)
     {
-        Inject(overlay.get());
-        overlay->OnStart();
-        overlays.push(std::move(overlay));
+        pending_overlays.push(overlay);
     }
 
     void SceneManager::Pop()
     {
-        if (!overlays.empty())
+        if (!overlay_names.empty())
         {
-            overlays.top()->OnEnd();
-            overlays.pop();
+            scenes[overlay_names.top()]->OnEnd();
+            overlay_names.pop();
+
+            const std::string &active = overlay_names.empty() ? current_name : overlay_names.top();
+            window->SetTitle(scenes[active]->window_config.title);
         }
     }
 

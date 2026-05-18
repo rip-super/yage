@@ -25,8 +25,6 @@ namespace yage
         Window *window = nullptr;
         Renderer *renderer = nullptr;
         Input *input = nullptr;
-        Shader *shader = nullptr;
-        Texture *texture = nullptr;
         SceneManager *scenes = nullptr;
 
         friend class SceneManager;

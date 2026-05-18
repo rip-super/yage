@@ -10,9 +10,10 @@
 #include <array>
 
 // todo: make param naming consistent
-//       fix circle texture UV seam
-//       texture support for outline draws
-//       add UV overloads for DrawPolygon(points, uvs, color)
+// todo: fix circle texture UV seam
+// todo: texture support for outline draws
+// todo: add UV overloads for DrawPolygon(points, uvs, color)
+// todo: DrawText
 
 static void ComputePolygonMiter(
     const glm::vec2 *verts, int count,
