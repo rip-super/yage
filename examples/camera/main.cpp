@@ -44,7 +44,7 @@ int main()
 
         float scroll = input.ScrollDelta();
         if (scroll != 0.0f)
-            current_zoom = clamp(current_zoom - scroll * 0.1f, 0.5f, 3.0f);
+            current_zoom = clamp(current_zoom + scroll * 0.025f, 0.5f, 3.0f);
 
         camera.Follow({player_x, player_y}, 5.0f, dt);
         camera.SetZoom(current_zoom);
