@@ -61,10 +61,10 @@ int main()
         float visible_width = window_size.x / current_zoom;
         float visible_height = window_size.y / current_zoom;
 
-        int start_x = (float)(floor((camera_pos.x - visible_width / 2.0f) / grid_size));
-        int start_y = (float)(floor((camera_pos.y - visible_height / 2.0f) / grid_size));
-        int end_x = (float)(ceil((camera_pos.x + visible_width / 2.0f) / grid_size));
-        int end_y = (float)(ceil((camera_pos.y + visible_height / 2.0f) / grid_size));
+        int start_x = (int)floor((camera_pos.x - visible_width / 2.0f) / grid_size);
+        int start_y = (int)floor((camera_pos.y - visible_height / 2.0f) / grid_size);
+        int end_x = (int)ceil((camera_pos.x + visible_width / 2.0f) / grid_size);
+        int end_y = (int)ceil((camera_pos.y + visible_height / 2.0f) / grid_size);
 
         for (int x = start_x; x < end_x; ++x)
         {
