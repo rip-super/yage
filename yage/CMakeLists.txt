@@ -16,9 +16,10 @@ target_include_directories(yage
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
             ${CMAKE_SOURCE_DIR}/deps/earcut
             ${CMAKE_SOURCE_DIR}/deps/stb_image
+            ${CMAKE_SOURCE_DIR}/deps/miniaudio/include
 )
 
-target_link_libraries(yage PUBLIC glfw glad glm)
+target_link_libraries(yage PUBLIC glfw glad glm miniaudio)
 
 if(WIN32)
     target_link_libraries(yage PUBLIC opengl32)
