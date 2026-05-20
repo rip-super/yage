@@ -19,10 +19,7 @@ add_library(glad STATIC deps/glad/src/glad.c)
 target_include_directories(glad PUBLIC deps/glad/include)
 
 add_library(miniaudio STATIC deps/miniaudio/src/miniaudio.c)
-target_include_directories(miniaudio
-    PUBLIC deps/miniaudio/include
-    PRIVATE deps/miniaudio/include
-)
+target_include_directories(miniaudio PUBLIC deps/miniaudio/include)
 
 add_subdirectory(deps/glm/glm)
 

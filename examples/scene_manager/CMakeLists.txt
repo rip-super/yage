@@ -1,3 +1,2 @@
 add_executable(scene_manager main.cpp)
-
-target_link_libraries(scene_manager PRIVATE yage)
+target_link_libraries(scene_manager PRIVATE yage_extras)
