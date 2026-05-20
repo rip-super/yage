@@ -16,6 +16,7 @@ configure_file(
 target_include_directories(yage_core
     PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include
             ${CMAKE_SOURCE_DIR}/deps/glm
+            ${CMAKE_SOURCE_DIR}/deps/nlohmann
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
             ${CMAKE_SOURCE_DIR}/deps/earcut
             ${CMAKE_SOURCE_DIR}/deps/stb_image
@@ -36,12 +37,14 @@ add_library(yage_extras STATIC
     src/extras/camera.cpp
     src/extras/scene_manager.cpp
     src/extras/texture.cpp
+    src/extras/serializer.cpp
 )
 
 target_link_libraries(yage_extras PUBLIC yage_core)
 
-target_include_directories(yage_extras PRIVATE
-    ${CMAKE_SOURCE_DIR}/deps/stb_image
+target_include_directories(yage_extras
+    PUBLIC  ${CMAKE_SOURCE_DIR}/deps/nlohmann
+    PRIVATE ${CMAKE_SOURCE_DIR}/deps/stb_image
 )
 
 add_library(yage_audio STATIC src/extras/audio.cpp)

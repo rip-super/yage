@@ -1,0 +1,2 @@
+add_executable(serializer main.cpp)
+target_link_libraries(serializer PRIVATE yage_extras)
