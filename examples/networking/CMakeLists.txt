@@ -1,0 +1,2 @@
+add_executable(networking main.cpp)
+target_link_libraries(networking PRIVATE yage_extras yage_network)
